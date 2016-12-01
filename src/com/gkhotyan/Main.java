@@ -1,19 +1,27 @@
 package com.gkhotyan;
 
-import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
+/**
+ * Main class. Responsible for threads starting
+ */
 public class Main
 {
     public static void main(String[] args)
     {
-        String filePath = "c:/sample.txt";
+        if(args.length<1){
+            throw new IllegalArgumentException("There is no file path");
+        }
+        String filePath = args[0];
+        Path path = Paths.get(filePath);
+        if(!Files.exists(path)){
+            throw new IllegalArgumentException("There is no file "+filePath);
+        }
 
         final int QUEUE_SIZE = 10;
         final int THREADS_SIZE = 5;
@@ -41,7 +49,6 @@ public class Main
 
             executor.shutdown();
             executor.awaitTermination(1000, TimeUnit.SECONDS);
-            System.out.println("Map size:" + wordsHashMap.size());
 
             for (Map.Entry<String, HashSet<String>> entry : wordsHashMap.entrySet()) {
                 HashSet<String> set = entry.getValue();
@@ -56,81 +63,7 @@ public class Main
     }
 }
 
-/**
- * This task works with the concrete word: searches for its anagrams and puts into the map.
- */
-class WorkerThread implements Runnable {
 
-    private String word;
-    ConcurrentHashMap<String, HashSet<String>> wordsHashMap;
-    public WorkerThread(String word, ConcurrentHashMap<String, HashSet<String>> wordsHashMap)
-    {
-        this.wordsHashMap = wordsHashMap;
-        this.word = word;
-    }
 
-    @Override
-    public void run() {
-        char[] chars = word.toCharArray();
-        Arrays.sort(chars);
-        String newWord = new String(chars);
 
-        if (!wordsHashMap.containsKey(newWord)) {
-            HashSet<String> copyOnWriteArraySet = new HashSet<>();
-            copyOnWriteArraySet.add(word);
-            wordsHashMap.putIfAbsent(newWord, copyOnWriteArraySet);
-        }
-        wordsHashMap.get(newWord).add(word);
-
-    }
-
-}
-
-/**
- * This task reads lines from file and puts them to the queue.
- */
-class LineReaderTask implements Runnable
-{
-    public static String END = "";
-
-    private BlockingQueue<String> queue;
-    private String filePath;
-
-    public LineReaderTask(BlockingQueue<String> queue, String filePath)
-    {
-        this.queue = queue;
-        this.filePath = filePath;
-    }
-
-    public void run()
-    {
-        try
-        {
-            readLines(filePath);
-            queue.put(END);
-        }
-        catch (InterruptedException e)
-        {
-        }
-    }
-
-    public void readLines(String filePath) throws InterruptedException {
-
-        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-
-            stream.forEach(s -> putToQueueWrapper(s));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void putToQueueWrapper(String s){
-        try {
-            queue.put(s);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-}
 
