@@ -28,7 +28,7 @@ public class MainJava8 {
       Stream<String> stream = Files.lines(Paths.get(filePath));
 
       ExecutorService executor = Executors.newFixedThreadPool(THREADS_SIZE);
-      List<CompletableFuture<Void>> result = stream.map(s1 -> CompletableFuture.runAsync(()->{calculate(s1);}, executor))
+      List<CompletableFuture<Void>> result = stream.map(s1 -> CompletableFuture.runAsync(()-> calculate(s1), executor))
                                                    .collect(Collectors.toList());
 
       CompletableFuture<Void> allDoneFuture =
