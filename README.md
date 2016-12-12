@@ -4,7 +4,7 @@ Given an input file which contains one word per line, as an output construct a l
 ####Design decisions
 We have two classes:
 1 - MainJava8 uses the features of JDK 8 - CompletableFuture class:
-It uses for the asynchronous calculation. It based on ForkJoinFramework and allow for each task to makes parallel reading words from the File, makes with them executions and put to the concurrentHashMap. 
+It used for the asynchronous calculation. It based on ForkJoinFramework and allows for each task to make parallel reading words from the File, make with them executions and put to the concurrentHashMap. 
 Numbers of tasks(threads) defines in THREADS_SIZE variable. It could be changed depending on input file size.
 
 2 - Main uses features of the older JDK versions:
