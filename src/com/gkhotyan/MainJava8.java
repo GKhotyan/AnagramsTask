@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class MainJava8 {
   private static ConcurrentHashMap<String, HashSet<String>> wordsHashMap = new ConcurrentHashMap<>();
-  private static final int THREADS_SIZE = 5;
+
 
   public static void main(String[] args)
   {
@@ -27,7 +27,9 @@ public class MainJava8 {
     try {
       Stream<String> stream = Files.lines(Paths.get(filePath));
 
-      ExecutorService executor = Executors.newFixedThreadPool(THREADS_SIZE);
+      int cores = Runtime.getRuntime().availableProcessors();
+
+      ExecutorService executor = Executors.newFixedThreadPool(cores);
       List<CompletableFuture<Void>> result = stream.map(s1 -> CompletableFuture.runAsync(()-> calculate(s1), executor))
                                                    .collect(Collectors.toList());
 

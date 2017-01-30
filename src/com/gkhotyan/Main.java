@@ -12,6 +12,8 @@ import java.util.concurrent.*;
  */
 public class Main
 {
+    final int QUEUE_SIZE = 10;
+
     public static void main(String[] args)
     {
         if(args.length<1){
@@ -23,8 +25,7 @@ public class Main
             throw new IllegalArgumentException("There is no file "+filePath);
         }
 
-        final int QUEUE_SIZE = 10;
-        final int THREADS_SIZE = 5;
+        int cores = Runtime.getRuntime().availableProcessors();
 
         BlockingQueue<String> queue = new ArrayBlockingQueue<>(QUEUE_SIZE);
         ConcurrentHashMap<String, HashSet<String>> wordsHashMap = new ConcurrentHashMap<>();
@@ -32,7 +33,7 @@ public class Main
         LineReaderTask enumerator = new LineReaderTask(queue, filePath);
         new Thread(enumerator).start();
 
-        ExecutorService executor = Executors.newFixedThreadPool(THREADS_SIZE);
+        ExecutorService executor = Executors.newFixedThreadPool(cores);
         boolean done = false;
         try{
             while (!done)

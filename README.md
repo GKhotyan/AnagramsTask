@@ -27,7 +27,3 @@ Second way:
 2. Execute next command at the directory with Main.class file (out/Anagrams/com/gkhotyan):
 *java -cp . Main [path_to_file]* 
 Example: *java -cp . Main c:/sample.txt*
-
-####Larger datasets
-Program execution time will increase. In order to reduce memory consumption it make sense to include one more HashMap object and store there full anagrams sets.
-For example, if we already have "aac", "aca", "caa", so we can put this set to the new Map, remove it from previous and ignore such words from the file. 
