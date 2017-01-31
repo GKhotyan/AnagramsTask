@@ -12,7 +12,7 @@ import java.util.concurrent.*;
  */
 public class Main
 {
-    final int QUEUE_SIZE = 10;
+    private static final int QUEUE_SIZE = 10;
 
     public static void main(String[] args)
     {

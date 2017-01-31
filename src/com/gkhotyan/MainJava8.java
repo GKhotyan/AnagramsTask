@@ -1,7 +1,7 @@
 package com.gkhotyan;
 
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
@@ -10,23 +10,12 @@ import java.util.stream.Stream;
 
 public class MainJava8 {
   private static ConcurrentHashMap<String, HashSet<String>> wordsHashMap = new ConcurrentHashMap<>();
-
+  private static final String FILE_PATH = "c:/sample.txt";
 
   public static void main(String[] args)
   {
-    if (args.length < 1) {
-      throw new IllegalArgumentException("There is no file path");
-    }
-    String filePath = args[0];
-
-    Path path = Paths.get(filePath);
-    if (!Files.exists(path)) {
-      throw new IllegalArgumentException("There is no file " + filePath);
-    }
-
     try {
-      Stream<String> stream = Files.lines(Paths.get(filePath));
-
+      Stream<String> stream = Files.lines(Paths.get(FILE_PATH));
       int cores = Runtime.getRuntime().availableProcessors();
 
       ExecutorService executor = Executors.newFixedThreadPool(cores);
@@ -36,26 +25,18 @@ public class MainJava8 {
       CompletableFuture<Void> allDoneFuture =
         CompletableFuture.allOf(result.toArray(new CompletableFuture[result.size()]));
 
-      try {
-        allDoneFuture.get();
-        executor.shutdown();
-      }
-      catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+      allDoneFuture.get();
+      executor.shutdown();
 
       for (Map.Entry<String, HashSet<String>> entry : wordsHashMap.entrySet()) {
         HashSet<String> set = entry.getValue();
-        if(set.size()>1){
-          set.stream().forEach(s-> System.out.print(s+" "));
-          System.out.println("");
-        }
+//        set.stream().reduce((s, s2) -> s.concat(" ").concat(s2)).ifPresent(System.out::println);
+        System.out.println(set.stream().collect(Collectors.joining(" ")));
       }
     }
-    catch (Exception e) {
+    catch (IOException | InterruptedException | ExecutionException e) {
       e.printStackTrace();
     }
-
   }
 
   public static void calculate(String word)  {
